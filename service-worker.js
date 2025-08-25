@@ -1,4 +1,4 @@
-const CACHE_NAME = "emociones-cache-v2";
+const CACHE_NAME = "emociones-cache-v3";
 
 const urlsToCache = [
 
