@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Espacio Seguro de Emociones - PWA Mejorado</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#4CAF50">
+
+<style>
+
+body {
+
+    background: linear-gradient(135deg, #f7f7f7, #e0f0ff);
+
+    min-height: 100vh;
+
+    transition: background 0.5s ease;
+
+    overflow: hidden;
+
+}
+
+.bubble, .spark {
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    opacity: 0.5;
+
+    pointer-events: none;
+
+}
+
+.bubble {
+
+    animation: rise 6s ease-out forwards;
+
+}
+
+.spark {
+
+    width: 6px;
+
+    height: 6px;
+
+    opacity: 0.7;
+
+    animation: sparkle 2s ease-out forwards;
+
+}
+
+@keyframes rise {
+
+    0% { transform: translateY(0) scale(0.5); opacity: 0.5; }
+
+    50% { opacity: 0.7; }
+
+    100% { transform: translateY(-350px) scale(1); opacity: 0; }
+
+}
+
+@keyframes sparkle {
+
+    0% { transform: translateY(0) scale(0.3); opacity: 0.7; }
+
+    100% { transform: translateY(-100px) scale(1); opacity: 0; }
+
+}
+
+.container {
+
+    position: relative;
+
+    z-index: 10;
+
+    max-width: 700px;
+
+    background: rgba(255,255,255,0.95);
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    margin-top: 20px;
+
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+
+}
+
+textarea { resize: none; overflow: hidden; }
+
+</style>
+
+</head>
+
+<body class="d-flex justify-content-center align-items-start py-4">
+
+<div class="container">
+
+<h1 class="text-center mb-4">Espacio Seguro de Emociones</h1>
+
+<form id="emotionForm">
+
+    <div class="mb-3">
+
+        <label for="emotionInput" class="form-label">Escribí tus emociones:</label>
+
+        <textarea id="emotionInput" class="form-control" rows="3" placeholder="Expresá lo que sentís..."></textarea>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label class="form-label">Marcá tus emociones actuales:</label>
+
+        <div class="row" id="emotionsChecklist"></div>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Enviar</button>
+
+    <div class="mt-3" id="message" class="text-muted"></div>
+
+    <div class="mt-2" id="dailyStats" class="text-muted"></div>
+
+</form>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+// Variables
+
+const emotionInput = document.getElementById('emotionInput');
+
+const emotionForm = document.getElementById('emotionForm');
+
+const messageDiv = document.getElementById('message');
+
+const dailyStatsDiv = document.getElementById('dailyStats');
+
+const emotionsChecklist = document.getElementById('emotionsChecklist');
+
+const body = document.body;
+
+// Lista de 30 emociones
+
+const emotionsList = [
+
+"Triste","Feliz","Ansioso","Calmado","Enojado",
+
+"Cansado","Frustrado","Motivado","Aburrido","Sorprendido",
+
+"Confundido","Amor","Soledad","Esperanzado","Asustado",
+
+"Orgulloso","Agradecido","Celoso","Aliviado","Melancólico",
+
+"Entusiasmado","Deprimido","Inseguro","Alegre","Preocupado",
+
+"Satisfecho","Nervioso","Tranquilo","Desanimado","Excitado"
+
+];
+
+// Crear checklist
+
+emotionsList.forEach((emo, index) => {
+
+    const col = document.createElement('div');
+
+    col.className = "col-6 col-md-4";
+
+    col.innerHTML = `<div class="form-check">
+
+        <input class="form-check-input" type="checkbox" value="${emo}" id="emo${index}">
+
+        <label class="form-check-label" for="emo${index}">${emo}</label>
+
+    </div>`;
+
+    emotionsChecklist.appendChild(col);
+
+});
+
+// Autoexpandir textarea
+
+emotionInput.addEventListener('input', () => {
+
+    emotionInput.style.height = 'auto';
+
+    emotionInput.style.height = (emotionInput.scrollHeight) + 'px';
+
+});
+
+// Crear burbujas
+
+function crearBurbuja() {
+
+    const bubble = document.createElement('div');
+
+    bubble.classList.add('bubble');
+
+    const size = Math.random()*30+20;
+
+    bubble.style.width = `${size}px`;
+
+    bubble.style.height = `${size}px`;
+
+    bubble.style.left = `${Math.random()*(window.innerWidth - size)}px`;
+
+    bubble.style.background = `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},0.4)`;
+
+    body.appendChild(bubble);
+
+    setTimeout(()=>bubble.remove(),6000);
+
+}
+
+// Crear destellos
+
+function crearSpark() {
+
+    const spark = document.createElement('div');
+
+    spark.classList.add('spark');
+
+    spark.style.left = `${Math.random() * window.innerWidth}px`;
+
+    spark.style.background = `rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},0.7)`;
+
+    body.appendChild(spark);
+
+    setTimeout(()=>spark.remove(),2000);
+
+}
+
+// Sugerencias más amplias
+
+function sugerencias(emotions,text){
+
+    const sug=[];
+
+    if(text.length>0) sug.push("Seguí escribiendo tus pensamientos para liberar tensión.");
+
+    if(emotions.includes("Triste")||emotions.includes("Deprimido")) sug.push("Hacé respiraciones profundas o escribí tus sentimientos.");
+
+    if(emotions.includes("Feliz")||emotions.includes("Alegre")) sug.push("Compartí tu alegría con alguien o disfrutá el momento.");
+
+    if(emotions.includes("Ansioso")||emotions.includes("Nervioso")) sug.push("Mové tu cuerpo o hacé ejercicios de relajación.");
+
+    if(emotions.includes("Enojado")) sug.push("Escribí tu enojo y luego caminá un poco para soltar tensión.");
+
+    if(emotions.includes("Cansado")) sug.push("Tomá un descanso o respirá profundamente.");
+
+    if(emotions.includes("Calmado")) sug.push("Disfrutá tu tranquilidad y meditación breve.");
+
+    if(emotions.includes("Motivado")||emotions.includes("Entusiasmado")) sug.push("Aprovechá tu energía para crear algo positivo.");
+
+    if(sug.length===0) sug.push("Expresá libremente tus emociones, no hay juicio aquí.");
+
+    return sug.join(" ");
+
+}
+
+// Guardar estadísticas locales
+
+function guardarEstadisticas(text, emotions){
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const palabras = text.trim().split(/\s+/).filter(w=>w.length>0).length;
+
+    const data = JSON.parse(localStorage.getItem("emocionesStats")||"{}");
+
+    if(!data[today]) data[today]={words:0,emotions:0};
+
+    data[today].words += palabras;
+
+    data[today].emotions += emotions.length;
+
+    localStorage.setItem("emocionesStats", JSON.stringify(data));
+
+    dailyStatsDiv.textContent = `Hoy: ${data[today].words} palabras escritas, ${data[today].emotions} emociones seleccionadas.`;
+
+}
+
+// Manejo de envío
+
+emotionForm.addEventListener('submit', (e)=>{
+
+    e.preventDefault();
+
+    const text=emotionInput.value.trim();
+
+    const checkedEmotions=Array.from(emotionsChecklist.querySelectorAll('input:checked')).map(el=>el.value);
+
+    if(text==="" && checkedEmotions.length===0){
+
+        messageDiv.textContent="Por favor, escribí o seleccioná al menos una emoción.";
+
+        return;
+
+    }
+
+    for(let i=0;i<6;i++) crearBurbuja();
+
+    for(let i=0;i<10;i++) crearSpark();
+
+    messageDiv.textContent = sugerencias(checkedEmotions,text);
+
+    guardarEstadisticas(text,checkedEmotions);
+
+    emotionInput.value="";
+
+    emotionInput.style.height='auto';
+
+    emotionsChecklist.querySelectorAll('input').forEach(input=>input.checked=false);
+
+});
+
+// Mostrar stats iniciales al cargar
+
+window.addEventListener('load', ()=>{
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const data = JSON.parse(localStorage.getItem("emocionesStats")||"{}");
+
+    if(data[today]){
+
+        dailyStatsDiv.textContent = `Hoy: ${data[today].words} palabras escritas, ${data[today].emotions} emociones seleccionadas.`;
+
+    }
+
+});
+
+if ('serviceWorker' in navigator) {
+
+  navigator.serviceWorker.register('service-worker.js')
+
+    .then(reg => {
+
+      console.log('Service Worker registrado:', reg);
+
+      reg.onupdatefound = () => {
+
+        const newWorker = reg.installing;
+
+        newWorker.onstatechange = () => {
+
+          if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
+
+            console.log("Nueva versión disponible, recargando...");
+
+            window.location.reload();
+
+          }
+
+        }
+
+      }
+
+    })
+
+    .catch(err => console.log('Service Worker fallo:', err));
+
+}
+
+</script>
+
+</body>
+
+</html>
