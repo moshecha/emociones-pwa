@@ -2,13 +2,13 @@ const CACHE_NAME = "emociones-cache-v1";
 
 const urlsToCache = [
 
-  "/index.html",
+  "./index.html",
 
-  "/manifest.json",
+  "./manifest.json",
 
-  "/icon-192.png",
+  "./icon-192.png",
 
-  "/icon-512.png",
+  "./icon-512.png",
 
   "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
 

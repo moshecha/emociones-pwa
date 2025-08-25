@@ -6,7 +6,7 @@
 
   "description": "Una app para expresar tus emociones de forma segura y sin guardar datos",
 
-  "start_url": "/index.html",
+  "start_url": "./index.html",
 
   "display": "standalone",
 
