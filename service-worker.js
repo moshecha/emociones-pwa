@@ -1,4 +1,4 @@
-const CACHE_NAME = "emociones-cache-v1";
+const CACHE_NAME = "emociones-cache-v2";
 
 const urlsToCache = [
 
@@ -16,15 +16,32 @@ const urlsToCache = [
 
 ];
 
-self.addEventListener("install", (event) => {
+
+self.addEventListener("install", event => {
 
   event.waitUntil(
 
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(async cache => {
+
+      for(const url of urlsToCache){
+
+        try{
+
+          await cache.add(url);
+
+        } catch(err){
+
+          console.warn("No se pudo cachear:", url, err);
+
+        }
+
+      }
+
+    })
 
   );
 
-  self.skipWaiting(); // Fuerza que este SW tome control inmediatamente
+  self.skipWaiting();
 
 });
 
